@@ -4,6 +4,7 @@ import com.training.platform.entities.User;
 import com.training.platform.repositories.UserRepository;
 
 // New import class for repository
+import com.training.platform.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
@@ -14,11 +15,11 @@ public class DemoController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping(value = "")
-    public List<User> index() throws Exception {
-        List<User> users = userRepository.findAll();
-        return users;
-    }
+//    @GetMapping(value = "")
+//    public List<User> index() throws Exception {
+//        List<User> users = userRepository.findAll();
+//        return users;
+//    }
 
 //    @GetMapping(value = "")
 //    public List<User> index() throws Exception {
@@ -46,6 +47,13 @@ public class DemoController {
 //        return userRepository.findAllByParamsQuery(0, "nakornpathom");
 //    }
 
+    @Autowired
+    private UserService userService;
+
+    @GetMapping(value = "")
+    public List<User> index() throws Exception {
+        return userService.findAllByJpqlParamsQuery(0, "bangkok");
+    }
 
     @GetMapping(value = "/create")
     public String create() throws Exception {

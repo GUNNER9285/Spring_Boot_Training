@@ -2,11 +2,14 @@ package com.training.platform.services;
 
 import com.training.platform.entities.User;
 import org.springframework.data.domain.Page;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.PageRequest;
+
+import java.util.*;;
 
 public interface UserService {
     List<User> findAll();
+
+    Page<User> findAll(PageRequest pageRequest);
 
     Optional<User> findById(Integer id);
 
@@ -23,4 +26,10 @@ public interface UserService {
     List<User> findAllByJpqlQuery();
 
     List<User> findAllByJpqlParamsQuery(Integer active, String city);
+
+    Map<String,String> getCities();
+
+    User save(Map<String,String> inputs) throws Exception;
+
+    boolean isEmailAlreadyInUse(String email);
 }
