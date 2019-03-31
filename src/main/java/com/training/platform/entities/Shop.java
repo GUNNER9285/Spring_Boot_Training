@@ -4,12 +4,17 @@ package com.training.platform.entities;
 
 import lombok.Data;
 import com.fasterxml.jackson.annotation.*;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name="shops")
+@EqualsAndHashCode(exclude="user")
+@ToString(exclude = {"user"})
 @Data
 public class Shop implements Serializable {
     @Id

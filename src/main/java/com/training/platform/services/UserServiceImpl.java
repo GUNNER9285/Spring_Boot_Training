@@ -16,6 +16,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UtilsService utilsService;
+
     @Override
     public List<User> findAll() {
         return userRepository.findAll();
@@ -85,7 +88,8 @@ public class UserServiceImpl implements UserService {
             user.setName(inputs.get("name"));
             user.setSurname(inputs.get("surname"));
             user.setEmail(inputs.get("email"));
-            user.setPassword(inputs.get("password"));
+            user.setPassword(utilsService.encrytePassword(inputs.get("password")));
+            //user.setConfirm_password(utilsService.encrytePassword(inputs.get("confirm_password")));
             user.setAge(Integer.parseInt(inputs.get("age")));
             user.setAddress(inputs.get("address"));
             user.setCity(inputs.get("city"));
@@ -104,6 +108,27 @@ public class UserServiceImpl implements UserService {
         boolean emailInuse = true;
         if (userRepository.findByEmail(email) == null) emailInuse = false;
         return emailInuse;
+    }
+
+    @Override
+    public User update(Optional<User> user, Map<String,String> inputs) throws Exception {
+        try {
+            user.get().setName(inputs.get("name"));
+            user.get().setSurname(inputs.get("surname"));
+            user.get().setAge(Integer.parseInt(inputs.get("age")));
+            user.get().setAddress(inputs.get("address"));
+            user.get().setCity(inputs.get("city"));
+            user.get().setMobile(inputs.get("mobile"));
+            user.get().setUpdatedAt(new Date());
+            return userRepository.save(user.get());
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    @Override
+    public void deleteById(Integer id) throws Exception {
+        userRepository.deleteById(id);
     }
 
 }
