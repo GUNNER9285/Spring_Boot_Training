@@ -1,4 +1,3 @@
-
 package com.training.platform.entities;
 
 import lombok.AllArgsConstructor;

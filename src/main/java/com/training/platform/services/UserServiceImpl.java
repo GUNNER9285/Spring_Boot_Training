@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -110,8 +111,9 @@ public class UserServiceImpl implements UserService {
         return emailInuse;
     }
 
+
     @Override
-    public User update(Optional<User> user, Map<String,String> inputs) throws Exception {
+    public void update(Optional<User> user, Map<String,String> inputs) throws Exception {
         try {
             user.get().setName(inputs.get("name"));
             user.get().setSurname(inputs.get("surname"));
@@ -120,7 +122,14 @@ public class UserServiceImpl implements UserService {
             user.get().setCity(inputs.get("city"));
             user.get().setMobile(inputs.get("mobile"));
             user.get().setUpdatedAt(new Date());
-            return userRepository.save(user.get());
+
+            ExecutorService executor = (ExecutorService)utilsService.getExecutor();
+            Runnable runnableTask = () -> {
+                System.out.println("ThreadPool : name : " + Thread.currentThread().getName());
+                userRepository.save(user.get());
+            };
+            executor.submit(runnableTask);
+
         } catch (Exception ex) {
             throw ex;
         }

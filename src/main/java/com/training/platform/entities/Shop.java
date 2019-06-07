@@ -1,5 +1,3 @@
-
-
 package com.training.platform.entities;
 
 import lombok.Data;
@@ -13,9 +11,9 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name="shops")
+@Data
 @EqualsAndHashCode(exclude="user")
 @ToString(exclude = {"user"})
-@Data
 public class Shop implements Serializable {
     @Id
     @Column(name = "id")

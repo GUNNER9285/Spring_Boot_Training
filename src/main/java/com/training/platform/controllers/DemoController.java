@@ -5,8 +5,14 @@ import com.training.platform.repositories.UserRepository;
 
 // New import class for repository
 import com.training.platform.services.UserService;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -90,5 +96,54 @@ public class DemoController {
     @DeleteMapping(value = "/{id}")
     public String destroy(@PathVariable String id) throws Exception {
         return "Method DELETE, Function : destroy, ID : "+ id +" => Receive id and DELETE data to DB";
+    }
+
+    @GetMapping(value = "/request-api")
+    public String testRequestApi() throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        MediaType mediaType = MediaType.parse("application/json");
+        okhttp3.RequestBody body = okhttp3.RequestBody.create(mediaType, "{\"email\":\"user1@gmail.com\",\"password\":\"12345\"}");
+        Request request = new Request.Builder()
+                .url("http://localhost:8080/api/auth/signin")
+                .post(body)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("cache-control", "no-cache")
+                .addHeader("Postman-Token", "d854ca45-ce28-4aa5-ac51-f6080339039b")
+                .build();
+
+        Response response = client.newCall(request).execute();
+        return response.body().string();
+    }
+
+    @GetMapping(value = "/thread")
+    public String thread(){
+        // Implementing Runnable using anonymous class (Old way)
+        Runnable runnable1 = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Thread 1 : name : " + Thread.currentThread().getName());
+            }
+        };
+        Thread thread1 = new Thread(runnable1);
+
+        // Implementing Runnable using Lambda expression
+        Runnable runnable2 = () -> {
+            System.out.println("Thread 2 : name : " + Thread.currentThread().getName());
+        };
+        Thread thread2 = new Thread(runnable2);
+
+        // Implementing Runnable using Lambda expression
+        Runnable runnable3 = () -> {
+            System.out.println("Thread 3 : name : " + Thread.currentThread().getName());
+        };
+        Thread thread3 = new Thread(runnable3);
+
+        // Start Threads
+        thread1.start();
+        thread2.start();
+        thread3.start();
+
+        return "OK";
     }
 }

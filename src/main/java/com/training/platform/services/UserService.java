@@ -33,7 +33,8 @@ public interface UserService {
 
     boolean isEmailAlreadyInUse(String email);
 
-    User update(Optional<User> user, Map<String,String> inputs) throws Exception;
+    //User update(Optional<User> user, Map<String,String> inputs) throws Exception;
+    void update(Optional<User> user, Map<String,String> inputs) throws Exception;
 
     void deleteById(Integer id) throws Exception;
 }

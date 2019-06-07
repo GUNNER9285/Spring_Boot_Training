@@ -6,31 +6,35 @@ import com.training.platform.validators.Default;
 import com.training.platform.validators.Extended;
 import com.training.platform.validators.FieldsValueMatch;
 import com.training.platform.validators.UniqueEmail;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 @Data
-@Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(exclude="shop")
 @ToString(exclude = {"shop"})
+@Entity
 @Table(name = "users")
+@FieldsValueMatch(field = "password",
+        fieldMatch = "confirm_password",
+        message = "The password fields must match")
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-@FieldsValueMatch(field = "password",
-        fieldMatch = "confirm_password",
-        message = "The password fields must match",
-        groups={ Extended.class })
-public class User implements Serializable {
+
+public class User implements UserDetails, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -51,6 +55,7 @@ public class User implements Serializable {
     @Column(name = "email")
     @NotEmpty(message = "Email is a required field", groups={ Extended.class })
     @Email(message = "Email is a email pattern", groups={ Extended.class })
+    //Insert this line
     @UniqueEmail(message = "There is already user with this email!", groups={ Extended.class })
     private String email;
 
@@ -91,11 +96,47 @@ public class User implements Serializable {
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private Shop shop;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> list = new ArrayList<GrantedAuthority>();
+
+        this.roles.stream().forEach((role) -> {
+            list.add(new SimpleGrantedAuthority(role.getRole()));
+        });
+
+        return list;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 
 }
